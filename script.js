@@ -1,10 +1,20 @@
 function addArticle() {
-  const input = document.getElementById('articleTitle');
-  const title = input.value.trim();
-  if (title === '') return alert('Введите название статьи!');
+  const articleInput = document.getElementById('articleTitle');
+  const title = articleInput.value.trim();
+
+  if (title === '') {
+    alert('Введите название статьи!');
+    return;
+  }
+
   const list = document.getElementById('articleList');
   const li = document.createElement('li');
-  li.textContent = title;
+  li.innerHTML = `
+    <span>${title}</span>
+    <button onclick="this.parentElement.remove()">Удалить</button>
+  `;
+
   list.appendChild(li);
-  input.value = '';
+  articleInput.value = '';
+  articleInput.focus();
 }
