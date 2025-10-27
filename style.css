@@ -7,3 +7,7 @@ button { padding:10px 16px; background:#4a7af8; color:#fff; border:0; border-rad
 button:hover { background:#375fe9; }
 ul { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
 li { background:#eef3ff; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; }
+.badge{ display:inline-block; margin-left:6px; padding:2px 8px; border-radius:999px; background:#e6e9ff; font-size:12px; }
+.badge.unread{ background:#ffe3e3; }
+.badge.reading{ background:#fff1c9; }
+.badge.read{ background:#dfffe6; }
