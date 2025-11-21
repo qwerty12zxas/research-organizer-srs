@@ -1,0 +1,36 @@
+@startuml
+title Sequence — Отметка статьи как прочитанной
+actor "Пользователь" as User
+participant "Интерфейс" as UI
+participant "Контроллер" as Controller
+participant "Сервис статей" as ArticleService
+participant "База данных" as DB
+participant "Сервис уведомлений" as NotificationService
+
+User -> UI: Кликает чекбокс\n"прочитано"
+activate User
+activate UI
+UI -> Controller: PATCH /api/articles/{id}\n{status: "read"}
+activate Controller
+Controller -> ArticleService: setStatus(id, "read")
+activate ArticleService
+ArticleService -> DB: UPDATE Articles\nSET status='read'\nWHERE article_id=?
+activate DB
+DB --> ArticleService: rows_affected
+deactivate DB
+
+alt Входит в подборку и все статьи прочитаны
+  ArticleService -> NotificationService: notifyCollectionCompleted(collection_id)
+  activate NotificationService
+  NotificationService --> ArticleService: sent
+  deactivate NotificationService
+end
+
+ArticleService --> Controller: Success()
+deactivate ArticleService
+Controller --> UI: 200 OK
+deactivate Controller
+UI --> User: Визуально отметить\n(серый цвет / галка)
+deactivate UI
+deactivate User
+@enduml

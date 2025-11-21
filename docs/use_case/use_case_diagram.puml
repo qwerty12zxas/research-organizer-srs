@@ -1,0 +1,41 @@
+@startuml
+left to right direction
+title Use Case — Органайзер научных статей
+
+actor "Пользователь" as User
+
+rectangle "Органайзер статей" {
+  usecase "Добавить статью" as AddArticle
+  usecase "Импорт по DOI" as ImportDOI
+  usecase "Редактировать статью" as EditArticle
+  usecase "Установить статус чтения" as SetStatus
+  usecase "Добавить ключевые слова" as AddKeywords
+  usecase "Поиск статей" as SearchArticles
+  usecase "Фильтрация статей" as FilterArticles
+  usecase "Просмотр списка статей" as ViewArticles
+  usecase "Ежедневный обзор" as DailyOverview
+  usecase "Валидация данных" as ValidateData
+  usecase "Автосохранение" as AutoSave
+}
+
+' include: обязательные подшаги
+AddArticle .> ValidateData : include
+EditArticle .> ValidateData : include
+EditArticle .> AutoSave    : include
+ImportDOI  .> ValidateData : include
+
+' extend: дополнительные функции, расширяющие основную
+ViewArticles <.. SearchArticles  : extend
+ViewArticles <.. FilterArticles  : extend
+DailyOverview <.. SearchArticles : extend
+DailyOverview <.. FilterArticles : extend
+
+' Ассоциации актёра
+User -- AddArticle
+User -- ImportDOI
+User -- EditArticle
+User -- SetStatus
+User -- AddKeywords
+User -- ViewArticles
+User -- DailyOverview
+@enduml

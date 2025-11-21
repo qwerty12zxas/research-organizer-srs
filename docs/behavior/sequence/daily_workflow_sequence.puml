@@ -1,0 +1,67 @@
+@startuml
+title Sequence — Ежедневный workflow (обзор/чтение/аналитика)
+actor "Пользователь" as User
+participant "Интерфейс" as UI
+participant "Контроллер" as Controller
+participant "Сервис статей" as ArticleService
+participant "Сервис аналитики" as AnalyticsService
+participant "База данных" as DB
+
+== Утренний обзор ==
+User -> UI: Открывает приложение
+activate User
+activate UI
+UI -> Controller: GET /api/articles/daily-overview
+activate Controller
+Controller -> ArticleService: getTodaysArticles(user_id)
+activate ArticleService
+ArticleService -> DB: SELECT * FROM Articles\nWHERE status!='read'\nORDER BY year DESC
+activate DB
+DB --> ArticleService: todays_list
+deactivate DB
+ArticleService --> Controller: DailyArticlesResponse(list)
+deactivate ArticleService
+Controller --> UI: 200 OK\n{list}
+deactivate Controller
+UI --> User: Показать "Что читать сегодня"
+deactivate UI
+
+== Чтение и отметка ==
+loop Для каждой прочитанной статьи
+  User -> UI: Отмечает прочитано
+  activate UI
+  UI -> Controller: PATCH /api/articles/{id}\n{status:"read"}
+  activate Controller
+  Controller -> ArticleService: setStatus(id,"read")
+  activate ArticleService
+  ArticleService -> DB: UPDATE Articles SET status='read'\nWHERE article_id=?
+  activate DB
+  DB --> ArticleService: success
+  deactivate DB
+  ArticleService --> Controller: Success()
+  deactivate ArticleService
+  Controller --> UI: 200 OK
+  deactivate Controller
+  UI --> User: Обновить прогресс
+  deactivate UI
+end
+
+== Вечерняя аналитика ==
+User -> UI: Запрашивает отчёт за день
+activate UI
+UI -> Controller: GET /api/analytics/daily
+activate Controller
+Controller -> AnalyticsService: getDailyReport(user_id)
+activate AnalyticsService
+AnalyticsService -> DB: Статистические запросы\nпо статусам за день
+activate DB
+DB --> AnalyticsService: analytics_data
+deactivate DB
+AnalyticsService --> Controller: AnalyticsReport(data)
+deactivate AnalyticsService
+Controller --> UI: 200 OK\n{read_count, in_progress_count}
+deactivate Controller
+UI --> User: Показать достижения за день
+deactivate UI
+deactivate User
+@enduml

@@ -1,0 +1,38 @@
+@startuml
+title Sequence — Добавление статьи
+actor "Пользователь" as User
+participant "Интерфейс" as UI
+participant "Контроллер" as Controller
+participant "Сервис статей" as ArticleService
+participant "База данных" as DB
+
+User -> UI: Вводит данные статьи\n(title, year, doi, url)
+activate User
+activate UI
+UI -> Controller: POST /api/articles {title, year, doi, url}
+activate Controller
+Controller -> ArticleService: createArticle(data)
+activate ArticleService
+ArticleService -> ArticleService: validate(data)
+alt Данные валидны
+  ArticleService -> DB: INSERT INTO Articles(...)
+  activate DB
+  DB --> ArticleService: article_id
+  deactivate DB
+  ArticleService --> Controller: Success(article_id)
+  deactivate ArticleService
+  Controller --> UI: 201 Created\n{article_id, message}
+  deactivate Controller
+  UI --> User: Показать уведомление\n"Статья добавлена"
+  deactivate UI
+  deactivate User
+else Ошибка валидации/дубликат DOI
+  ArticleService --> Controller: Error("Неверные данные")
+  deactivate ArticleService
+  Controller --> UI: 400 Bad Request {error}
+  deactivate Controller
+  UI --> User: Показать ошибку валидации
+  deactivate UI
+  deactivate User
+end
+@enduml
