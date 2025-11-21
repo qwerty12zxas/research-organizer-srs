@@ -1,0 +1,27 @@
+@startuml
+title Sequence — Фильтрация статей
+actor "Пользователь" as User
+participant "Интерфейс" as UI
+participant "Контроллер" as Controller
+participant "Сервис статей" as ArticleService
+participant "База данных" as DB
+
+User -> UI: Выбирает фильтр\nkeyword / author / year
+activate User
+activate UI
+UI -> Controller: GET /api/articles?keyword={id}&author={aid}&year={y}
+activate Controller
+Controller -> ArticleService: getFiltered(params)
+activate ArticleService
+ArticleService -> DB: SELECT a.* FROM Articles a\nJOIN ArticleKeywords ak ON ak.article_id=a.article_id\nJOIN Keywords k ON k.keyword_id=ak.keyword_id\nLEFT JOIN ArticleAuthors aa ON aa.article_id=a.article_id\nLEFT JOIN Authors au ON au.author_id=aa.author_id\nWHERE (k.keyword_id=? OR ? IS NULL)\n  AND (au.author_id=? OR ? IS NULL)\n  AND (a.year=? OR ? IS NULL)
+activate DB
+DB --> ArticleService: articles_list
+deactivate DB
+ArticleService --> Controller: ArticlesListResponse(articles)
+deactivate ArticleService
+Controller --> UI: 200 OK\n{articles[]}
+deactivate Controller
+UI --> User: Показать отфильтрованные статьи
+deactivate UI
+deactivate User
+@enduml
