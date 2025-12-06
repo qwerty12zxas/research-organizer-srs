@@ -1,0 +1,820 @@
+{
+	"info": {
+		"_postman_id": "5a052618-b1f9-45e2-bbc4-c2c2b3b5e1ff",
+		"name": "ResearchOrganizer API",
+		"description": "Коллекция для тестирования API веб-приложения \"Органайзер научных статей\".",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50511587",
+		"_collection_link": "https://vladislav-troshin2004-9584183.postman.co/workspace/Vlad's-Workspace~9f1500d5-61d0-4733-8d40-2312453918d9/collection/50511587-5a052618-b1f9-45e2-bbc4-c2c2b3b5e1ff?action=share&source=collection_link&creator=50511587"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response has auth token\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.token).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.user_id).to.be.a('number');\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Save auth data\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"auth_token\", jsonData.token);\r",
+									"    pm.environment.set(\"user_id\", jsonData.user_id);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-mock-response-name",
+								"value": "Error - Invalid credentials",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "x-mock-response-name",
+								"value": "Success - Login",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"vlad\",\r\n  \"password\": \"testpass123\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login?username=vlad",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "vlad"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"vlad\",\r\n  \"password\": \"testpass123\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/login?username=vlad",
+									"path": [
+										"auth",
+										"login"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "vlad"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"mock_token_abc123\",\n    \"user_id\": 1,\n    \"username\": \"vlad\",\n    \"message\": \"Login successful\"\n}"
+						},
+						{
+							"name": "Error - Invalid credentials",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"vlad\",\r\n  \"password\": \"testpass123\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "/auth/login?username=vlad1",
+									"path": [
+										"auth",
+										"login"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "vlad1"
+										}
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"Invalid credentials\",\n    \"code\": \"AUTH_ERROR\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Articles",
+			"item": [
+				{
+					"name": "Get Articles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response has articles array\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"articles\");",
+									"    pm.expect(json.articles).to.be.an(\"array\");",
+									"});",
+									"",
+									"pm.test(\"Save first article id\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.articles.length > 0) {",
+									"        pm.environment.set(\"article_id\", json.articles[0].id);",
+									"        console.log(\"Saved article_id:\", json.articles[0].id);",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-mock-response-name",
+								"value": "Success - With articles",
+								"type": "text"
+							},
+							{
+								"key": "x-mock-response-name",
+								"value": "Success - Empty list",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/articles?status=published",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"articles"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "published"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - With articles",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "/articles?status=published",
+									"path": [
+										"articles"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "published"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"name": "Content-Type",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"articles\": [\n        {\n            \"id\": 1,\n            \"title\": \"Deep Learning for Logistics\",\n            \"abstract\": \"Overview of using neural networks for transport optimization.\",\n            \"year\": 2023,\n            \"doi\": \"10.1234/dl-logistics-2023\",\n            \"collection_id\": 1,\n            \"is_favorite\": true,\n            \"created_at\": \"2025-12-01T10:00:00Z\"\n        },\n        {\n            \"id\": 2,\n            \"title\": \"Supply Chain Resilience in Russia\",\n            \"abstract\": \"Case study of regional logistics hubs and multimodal flows.\",\n            \"year\": 2022,\n            \"doi\": \"10.5678/scr-ru-2022\",\n            \"collection_id\": 2,\n            \"is_favorite\": false,\n            \"created_at\": \"2025-11-20T14:30:00Z\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Success - Empty list",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "/articles?status=published",
+									"path": [
+										"articles"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "published"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"name": "Content-Type",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\n    \"articles\": []\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Article",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Status is 201 (created)\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Created article response has article_id and message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"\r",
+									"    pm.expect(json).to.have.property(\"article_id\");\r",
+									"    pm.expect(json.article_id).to.be.a(\"number\");\r",
+									"\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.include(\"created\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-mock-response-name",
+								"value": "Success - Created",
+								"type": "text"
+							},
+							{
+								"key": "x-mock-response-name",
+								"value": "Error - Validation failed",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Новая статья по логистике\",\r\n  \"abstract\": \"Краткое описание статьи для ResearchOrganizer.\",\r\n  \"status\": \"draft\",\r\n  \"collection_id\": 1,\r\n  \"keywords\": [\"logistics\", \"ports\", \"research\"]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/articles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"articles"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Новая статья по логистике\",\r\n  \"abstract\": \"Краткое описание статьи для ResearchOrganizer.\",\r\n  \"status\": \"draft\",\r\n  \"collection_id\": 1,\r\n  \"keywords\": [\"logistics\", \"ports\", \"research\"]\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/articles",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"articles"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"article_id\": 1,\n    \"message\": \"Article created successfully\",\n    \"created_at\": \"2025-12-01T10:00:00Z\"\n}"
+						},
+						{
+							"name": "Error - Validation failed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Новая статья по логистике\",\r\n  \"abstract\": \"Краткое описание статьи для ResearchOrganizer.\",\r\n  \"status\": \"draft\",\r\n  \"collection_id\": 1,\r\n  \"keywords\": [\"logistics\", \"ports\", \"research\"]\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/articles",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"articles"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"Validation failed\",\n    \"code\": \"VALIDATION_ERROR\",\n    \"details\": {\n        \"title\": \"Title is required\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Article",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Status is 200 when article is updated\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Update response has message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    pm.expect(json.message).to.include(\"updated\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-mock-response-name",
+								"value": "Success - Article updated",
+								"type": "text"
+							},
+							{
+								"key": "x-mock-response-name",
+								"value": "Error - Article not found",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"status\": \"published\",\r\n  \"collection_id\": 2,\r\n  \"title\": \"Новая версия статьи по логистике\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/articles/?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"articles",
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - Article updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"status\": \"published\",\r\n  \"collection_id\": 2,\r\n  \"title\": \"Новая версия статьи по логистике\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/articles/?id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"articles",
+										""
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Article updated\"\r\n}\r\n"
+						},
+						{
+							"name": "Error - Article not found",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"status\": \"published\",\r\n  \"collection_id\": 2,\r\n  \"title\": \"Новая версия статьи по логистике\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/articles/?id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"articles",
+										""
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"error\": \"Article not found\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Delete Arcticle",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-mock-response-name",
+								"value": "Success - Article deleted",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "x-mock-response-name",
+								"value": "Error - Article not found",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/articles/?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"articles",
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - Article deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/articles/?id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"articles",
+										""
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Article deleted\"\r\n}\r\n"
+						},
+						{
+							"name": "Error - Article not found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/articles/?id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"articles",
+										""
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"error\": \"Article not found\"\r\n}\r\n"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Collections",
+			"item": [
+				{
+					"name": "Get Collections",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-mock-response-name",
+								"value": "Success - Collections list",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "x-mock-response-name",
+								"value": "Success - Empty collections",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/collections",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"collections"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success - Collections list",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/collections",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"collections"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\n    \"collections\": [\n        {\n            \"id\": 1,\n            \"name\": \"Основные статьи по логистике\",\n            \"description\": \"Базовая подборка ключевых статей для диплома.\",\n            \"articles_count\": 12\n        },\n        {\n            \"id\": 2,\n            \"name\": \"API и тестирование\",\n            \"description\": \"Статьи про REST, Postman, mock-сервера.\",\n            \"articles_count\": 7\n        }\n    ]\n}"
+						},
+						{
+							"name": "Success - Empty collections",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/collections",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"collections"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"name": "Content-Type",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"collections\": []\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}
